@@ -175,6 +175,12 @@ body{
 .frame-explain ol{ margin:10px 0 0 18px; font-size:0.84rem; line-height:1.5; }
 .frame-explain + .frame-explain{ margin-top:12px; }
 
+/* Info (?) — clean: rótulo curto + card por extenso no dialog */
+.app-hint{ max-width:1520px; margin:6px auto 0; padding:0 18px; font-size:0.72rem; color:#6b6760; }
+.info-btn{ display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; padding:0; border:1px solid #b9ad9a; border-radius:999px; background:#fff; color:var(--accent); font-size:0.68rem; font-weight:800; line-height:1; cursor:pointer; vertical-align:middle; }
+.info-btn:hover{ background:#fbf8f1; }
+.dialog--info article p{ margin:8px 0 0; font-size:0.86rem; line-height:1.5; color:#2f2d29; }
+
 /* Drawing SVG specifics */
 .dwg-frame{ cursor:pointer; }
 .dwg-frame:hover rect{ fill:#fff7e8; }

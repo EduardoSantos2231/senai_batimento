@@ -31,6 +31,7 @@
       <div class="topbar-badge">pt-BR · mm · datum A</div>
     </div>
   </header>
+  <p class="app-hint">Toque nos ícones <strong>?</strong> ao lado dos termos para ver explicações detalhadas.</p>
 
   <main class="layout">
     <!-- A. DESENHO TÉCNICO -->
@@ -49,7 +50,7 @@
         <button class="btn btn-ghost" id="btn-como-ler">Como ler este símbolo?</button>
         <button class="btn btn-ghost" id="btn-comparar">Comparar tolerâncias</button>
       </div>
-      <p class="footnote">Valores de tolerância exibidos (ex.: 0,05) são <strong>ilustrativos</strong>. Use sempre o valor do desenho oficial da atividade.</p>
+      <p class="footnote">Valores de tolerância são <strong>ilustrativos</strong>. Use o valor do desenho oficial.</p>
     </section>
 
     <!-- B. SIMULAÇÃO 3D -->
@@ -59,7 +60,7 @@
         <div id="three-mount"></div>
         <div class="canvas-overlay">
           <span class="overlay-tag" id="modeTag">Batimento circular radial</span>
-          <span class="overlay-tag overlay-tag--datum" id="datumTag">Datum A · eixo de referência</span>
+          <span class="overlay-tag overlay-tag--datum" id="datumTag">Datum A · eixo de referência <button class="info-btn" data-info="datum" aria-label="Ajuda: datum A">?</button></span>
         </div>
       </div>
 
@@ -67,28 +68,28 @@
       <div class="readout" aria-live="polite">
         <div class="readout-grid">
           <div class="readout-cell">
-            <span class="readout-label">Leitura atual</span>
+            <span class="readout-label">Leitura <button class="info-btn" data-info="leitura" aria-label="Ajuda: leitura atual">?</button></span>
             <span class="readout-value" id="val-atual">0,000 mm</span>
           </div>
           <div class="readout-cell">
-            <span class="readout-label">Mín</span>
+            <span class="readout-label">Mín <button class="info-btn" data-info="minmax" aria-label="Ajuda: mínimo e máximo">?</button></span>
             <span class="readout-value readout-value--muted" id="val-min">—</span>
           </div>
           <div class="readout-cell">
-            <span class="readout-label">Máx</span>
+            <span class="readout-label">Máx <button class="info-btn" data-info="minmax" aria-label="Ajuda: mínimo e máximo">?</button></span>
             <span class="readout-value readout-value--muted" id="val-max">—</span>
           </div>
           <div class="readout-cell readout-cell--tir">
-            <span class="readout-label">TIR = máx − mín</span>
+            <span class="readout-label">Variação = mín→máx <button class="info-btn" data-info="tir" aria-label="Ajuda: variação">?</button></span>
             <span class="readout-value readout-value--tir" id="val-tir">—</span>
-            <span class="readout-sub" id="val-tolerancia">Tolerância: 0,05 mm</span>
+            <span class="readout-sub" id="val-tolerancia">Tolerância <button class="info-btn" data-info="tolerancia" aria-label="Ajuda: tolerância">?</button> 0,05 mm</span>
           </div>
         </div>
         <div class="veredito" id="veredito">
           <span class="veredito-dot" id="veredito-dot"></span>
           <span id="veredito-texto">Aguardando medição — gire o eixo para coletar leituras.</span>
         </div>
-        <p class="readout-note">Modelo educacional simplificado, não é instrumento de metrologia certificado.</p>
+        <p class="readout-note">Modelo educacional <button class="info-btn" data-info="modelo" aria-label="Ajuda: modelo educacional">?</button></p>
       </div>
 
       <!-- Controles -->
@@ -103,8 +104,8 @@
             <span>Velocidade <strong id="speedLabel">1,0×</strong></span>
             <input type="range" id="speedSlider" min="0.2" max="2.5" step="0.1" value="1" />
           </label>
-          <label class="slider" title="Excentricidade e: TIR ≈ 2×e">
-            <span>Excentricidade <em>e</em> <strong id="ampLabel">0,05 mm</strong> <small style="font-weight:400;color:#6b6760">(TIR ≈ 2×e)</small></span>
+          <label class="slider" title="Excentricidade e: variação ≈ 2×e">
+            <span>Excentricidade <em>e</em> <strong id="ampLabel">0,05 mm</strong> <small style="font-weight:400;color:#6b6760">(variação ≈ 2×e)</small> <button class="info-btn" data-info="excentricidade" aria-label="Ajuda: excentricidade">?</button></span>
             <input type="range" id="ampSlider" min="0" max="0.12" step="0.01" value="0.05" />
           </label>
         </div>
@@ -112,16 +113,16 @@
           <button class="btn btn-ghost" id="btn-camera">Restaurar câmera</button>
           <label class="check">
             <input type="checkbox" id="chk-datum" checked />
-            <span>Mostrar eixo de datum e referências</span>
+            <span>Mostrar eixo de referência <button class="info-btn" data-info="datum" aria-label="Ajuda: datum">?</button></span>
           </label>
         </div>
-        <p class="controls-hint">Arraste para orbitar · Scroll para zoom · Shift+arraste para panorâmica</p>
+        <p class="controls-hint">Como navegar <button class="info-btn" data-info="navegacao" aria-label="Ajuda: navegação 3D">?</button></p>
       </div>
     </section>
 
     <!-- C. INTERPRETAÇÃO -->
     <section class="panel" id="panel-interp">
-      <h2>Interpretação</h2>
+      <h2>Interpretação <button class="info-btn" id="btn-info-modo" aria-label="Ajuda: modo atual">?</button></h2>
       <div id="interp-conteudo">
         <h3 id="interp-titulo">Batimento circular radial</h3>
         <p id="interp-texto">O batimento circular radial controla a variação indicada em uma seção circular específica da superfície, durante uma volta em torno do datum.</p>
@@ -134,8 +135,7 @@
 
       <div class="datum-card">
         <strong>Datum A</strong>
-        <p>“O datum A estabelece a referência utilizada para verificar o batimento da superfície indicada.”</p>
-        <p class="datum-card-small">Recurso de datum (superfície física) ≠ datum (referência teórica) ≠ eixo de datum (linha de referência). Aqui, o eixo de datum é o eixo longitudinal do mancal designado.</p>
+        <p>O eixo em torno do qual o batimento é medido.</p>
       </div>
 
       <div class="tolerancia-card" id="card-comparar" hidden>
@@ -180,6 +180,13 @@
         <p><strong>Seta dupla = total.</strong> Controla a superfície cilíndrica inteira; o indicador translada ao longo do eixo enquanto a peça gira.</p>
       </div>
       <form method="dialog"><button class="btn btn-primary">Entendi</button></form>
+    </article>
+  </dialog>
+  <dialog id="dlg-info" class="dialog dialog--info">
+    <article>
+      <h3 id="dlg-info-titulo"></h3>
+      <div id="dlg-info-corpo"></div>
+      <form method="dialog"><button class="btn btn-primary">Fechar</button></form>
     </article>
   </dialog>
 

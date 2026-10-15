@@ -2,6 +2,12 @@
 
 Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Mecânica.
 
+## 🌐 Acesso rápido
+
+A aplicação está publicada e pode ser aberta no navegador, sem instalar nada. Copie e cole o endereço:
+
+https://eduardosantos2231.github.io/senai_batimento/
+
 ## 📋 Índice
 
 1. [Instalação e Execução](#-instalação-e-execução)
