@@ -513,6 +513,19 @@ function updateModeVisuals(){
   if(datumGroup) datumGroup.visible = datumVisible;
 }
 function syncPills(){ document.querySelectorAll('.pill').forEach(b=> b.classList.toggle('active', b.dataset.mode===mode)); }
+const INFO = {
+  leitura: { t:'Leitura atual do relógio', corpo:'<p>O valor que o relógio comparador está indicando neste instante da rotação. Sozinha, uma leitura não decide se a peça está aprovada ou não — o que importa é a variação dessa leitura durante a rotação.</p>' },
+  minmax: { t:'Mínimo e máximo', corpo:'<p>A menor e a maior leitura registradas desde que a medição começou (ou desde que você clicou em “Zerar”). A diferença entre as duas é a variação total (TIR).</p>' },
+  tir: { t:'Variação total (TIR)', corpo:'<p><strong>TIR</strong> significa <em>Total Indicator Reading</em> — a variação total da leitura. É a diferença entre a maior e a menor leitura. Por exemplo, leituras entre −0,03 e +0,05 milímetros dão TIR de 0,08 milímetros. O número que você compara com a tolerância do desenho é essa variação, não a leitura de um ponto isolado.</p><p>O relógio mede em milímetros (mm).</p>' },
+  tolerancia: { t:'Tolerância permitida', corpo:'<p>O maior valor de variação que a peça pode ter e ainda ser aprovada. Se a variação total (TIR) for menor ou igual à tolerância, a peça está aprovada; se for maior, está reprovada. Neste laboratório o valor de 0,05 milímetros é apenas ilustrativo — em sala, use sempre o valor do desenho oficial.</p>' },
+  datum: { t:'Referência A (datum A)', corpo:'<p>O <strong>datum A</strong> é o eixo de referência em torno do qual o batimento é medido. Neste laboratório, é o eixo longitudinal dos mancais onde o eixo está apoiado.</p><p>Em desenho técnico: <em>recurso de datum</em> é a superfície física da peça, <em>datum</em> é a referência teórica e <em>eixo de datum</em> é a linha de referência. Todas as medições de batimento são feitas girando a peça em torno desse eixo.</p>' },
+  excentricidade: { t:'Excentricidade (e)', corpo:'<p>O quanto o centro do cilindro está deslocado do eixo de rotação. Se o cilindro estiver deslocado e girar, a ponta do relógio sobe e desce. Para um cilindro perfeitamente excêntrico, a variação total é aproximadamente o dobro da excentricidade: <strong>TIR é aproximadamente 2 vezes e</strong>.</p>' },
+  radial: { t:'Batimento circular radial', corpo:'<p>Mede a variação da leitura em <strong>uma única seção circular</strong> da superfície lateral — como se fosse uma “fatia” do cilindro.</p><p><strong>Como mede:</strong> o relógio fica parado, encostado no topo da peça, e apenas a peça gira. A seta vermelha indica a direção radial (do centro para fora).</p><p>Pode revelar excentricidade (o centro saiu do lugar), ovalização (a seção não é perfeitamente redonda) ou outras irregularidades da lateral.</p>' },
+  axial: { t:'Batimento circular axial', corpo:'<p>Mede a variação ao longo de <strong>um círculo sobre a face plana</strong> (a “tampa” do cilindro), que é perpendicular ao eixo.</p><p><strong>Como mede:</strong> o relógio fica parado, encostado na face, apontando ao longo do comprimento do eixo; a peça gira.</p><p>Pode revelar face inclinada, empeno (face torta) ou falta de perpendicularidade com o eixo.</p>' },
+  total: { t:'Batimento total radial', corpo:'<p>Mede a variação de <strong>toda a superfície cilíndrica, de ponta a ponta</strong>. A peça gira e, ao mesmo tempo, o relógio se desloca ao longo do comprimento do eixo, percorrendo toda a superfície.</p><p>É diferente do batimento circular: o circular avalia apenas uma seção; o total avalia a superfície inteira. Os dois não são a mesma coisa.</p>' },
+  navegacao: { t:'Como navegar no 3D', corpo:'<p>Arraste com o botão esquerdo do mouse para girar a vista. Use a roda do mouse para aproximar ou afastar. Segure a tecla <strong>Shift</strong> enquanto arrasta para deslocar a vista lateralmente.</p>' },
+  modelo: { t:'Modelo educacional', corpo:'<p>Simulação simplificada para aprender o conceito, com defeitos geométricos exagerados para ficarem visíveis. Não é um instrumento de medição certificado.</p>' },
+};
 
 function tick(){
   requestAnimationFrame(tick);
@@ -541,10 +554,27 @@ function onResize(){
   camera.updateProjectionMatrix();
   renderer.setSize(w,h);
 }
+function openInfo(key){
+  const entry = INFO[key] || INFO[mode];
+  if(!entry) return;
+  const dlg = document.getElementById('dlg-info');
+  document.getElementById('dlg-info-titulo').textContent = entry.t;
+  document.getElementById('dlg-info-corpo').innerHTML = entry.corpo;
+  dlg.showModal();
+}
 function wire(){
   cacheEls();
   document.querySelectorAll('.pill').forEach(b=> b.addEventListener('click', ()=> setMode(b.dataset.mode)));
   $('#btn-como-ler').addEventListener('click', ()=> $('#dlg-ler').showModal());
+  document.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.info-btn');
+    if(!btn) return;
+    e.preventDefault();
+    const key = btn.dataset.info === 'mode' ? mode : btn.dataset.info;
+    openInfo(key);
+  });
+  const btnModo = document.getElementById('btn-info-modo');
+  if(btnModo) btnModo.addEventListener('click', ()=> openInfo(mode));
   $('#btn-comparar').addEventListener('click', ()=>{
     const willShow = els.cardComparar.hidden;
     els.cardComparar.hidden = !willShow;
