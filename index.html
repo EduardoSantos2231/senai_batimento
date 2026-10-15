@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Batimento Geométrico — Laboratório Interativo</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div>
+        <h1>Tolerâncias Geométricas — Batimento</h1>
+        <p>Curso Técnico em Fabricação Mecânica · Desenho Técnico</p>
+      </div>
+      <div class="topbar-badge">pt-BR · mm · datum A</div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- A. DESENHO TÉCNICO -->
+    <section class="panel" id="panel-desenho">
+      <h2>Desenho Técnico</h2>
+      <p class="panel-hint">Clique num quadro de tolerância para selecionar o modo. A superfície controlada será destacada no 3D.</p>
+      <div id="drawingContainer" class="drawing-wrap"></div>
+
+      <div class="mode-pills" role="tablist" aria-label="Modos de batimento">
+        <button class="pill active" data-mode="radial" id="pill-radial">Batimento circular radial</button>
+        <button class="pill" data-mode="axial" id="pill-axial">Batimento circular axial</button>
+        <button class="pill" data-mode="total" id="pill-total">Batimento total radial</button>
+      </div>
+
+      <div class="drawing-actions">
+        <button class="btn btn-ghost" id="btn-como-ler">Como ler este símbolo?</button>
+        <button class="btn btn-ghost" id="btn-comparar">Comparar tolerâncias</button>
+      </div>
+      <p class="footnote">Valores de tolerância exibidos (ex.: 0,05) são <strong>ilustrativos</strong>. Use sempre o valor do desenho oficial da atividade.</p>
+    </section>
+
+    <!-- B. SIMULAÇÃO 3D -->
+    <section class="panel panel-3d" id="panel-3d">
+      <h2>Simulação 3D</h2>
+      <div id="canvasWrap" class="canvas-wrap">
+        <div id="three-mount"></div>
+        <div class="canvas-overlay">
+          <span class="overlay-tag" id="modeTag">Batimento circular radial</span>
+          <span class="overlay-tag overlay-tag--datum" id="datumTag">Datum A · eixo de referência</span>
+        </div>
+      </div>
+
+      <!-- Display digital -->
+      <div class="readout" aria-live="polite">
+        <div class="readout-grid">
+          <div class="readout-cell">
+            <span class="readout-label">Leitura atual</span>
+            <span class="readout-value" id="val-atual">0,000 mm</span>
+          </div>
+          <div class="readout-cell">
+            <span class="readout-label">Mín</span>
+            <span class="readout-value readout-value--muted" id="val-min">—</span>
+          </div>
+          <div class="readout-cell">
+            <span class="readout-label">Máx</span>
+            <span class="readout-value readout-value--muted" id="val-max">—</span>
+          </div>
+          <div class="readout-cell readout-cell--tir">
+            <span class="readout-label">TIR = máx − mín</span>
+            <span class="readout-value readout-value--tir" id="val-tir">—</span>
+            <span class="readout-sub" id="val-tolerancia">Tolerância: 0,05 mm</span>
+          </div>
+        </div>
+        <div class="veredito" id="veredito">
+          <span class="veredito-dot" id="veredito-dot"></span>
+          <span id="veredito-texto">Aguardando medição — gire o eixo para coletar leituras.</span>
+        </div>
+        <p class="readout-note">Modelo educacional simplificado, não é instrumento de metrologia certificado.</p>
+      </div>
+
+      <!-- Controles -->
+      <div class="controls">
+        <div class="controls-row">
+          <button class="btn btn-primary" id="btn-start">▶ Iniciar</button>
+          <button class="btn" id="btn-uma-volta">Uma volta (360°)</button>
+          <button class="btn" id="btn-reset">Zerar</button>
+        </div>
+        <div class="controls-row controls-row--sliders">
+          <label class="slider">
+            <span>Velocidade <strong id="speedLabel">1,0×</strong></span>
+            <input type="range" id="speedSlider" min="0.2" max="2.5" step="0.1" value="1" />
+          </label>
+          <label class="slider">
+            <span>Erro geométrico <strong id="ampLabel">0,05 mm</strong></span>
+            <input type="range" id="ampSlider" min="0" max="0.12" step="0.01" value="0.05" />
+          </label>
+        </div>
+        <div class="controls-row">
+          <button class="btn btn-ghost" id="btn-camera">Restaurar câmera</button>
+          <label class="check">
+            <input type="checkbox" id="chk-datum" checked />
+            <span>Mostrar eixo de datum e referências</span>
+          </label>
+        </div>
+        <p class="controls-hint">Arraste para orbitar · Scroll para zoom · Shift+arraste para panorâmica</p>
+      </div>
+    </section>
+
+    <!-- C. INTERPRETAÇÃO -->
+    <section class="panel" id="panel-interp">
+      <h2>Interpretação</h2>
+      <div id="interp-conteudo">
+        <h3 id="interp-titulo">Batimento circular radial</h3>
+        <p id="interp-texto">O batimento circular radial controla a variação indicada em uma seção circular específica da superfície, durante uma volta em torno do datum.</p>
+        <ul class="interp-bullets" id="interp-bullets">
+          <li><strong>O que controla:</strong> excentricidade/ovalização da superfície lateral.</li>
+          <li><strong>Onde se aplica:</strong> seção circular da lateral do eixo.</li>
+          <li><strong>O que o relógio mede:</strong> deslocamento <em>radial</em> (seta vermelha) enquanto a peça gira.</li>
+        </ul>
+      </div>
+
+      <div class="datum-card">
+        <strong>Datum A</strong>
+        <p>“O datum A estabelece a referência utilizada para verificar o batimento da superfície indicada.”</p>
+        <p class="datum-card-small">Recurso de datum (superfície física) ≠ datum (referência teórica) ≠ eixo de datum (linha de referência). Aqui, o eixo de datum é o eixo longitudinal do mancal designado.</p>
+      </div>
+
+      <div class="tolerancia-card" id="card-comparar" hidden>
+        <h4>Comparar: circular × total</h4>
+        <div class="comparar-grid">
+          <div><strong>Circular</strong><br/>seção individual · indicador fixo</div>
+          <div><strong>Total</strong><br/>superfície inteira · indicador translada</div>
+        </div>
+        <p>Total não é “outro nome” para circular. Total acumula a variação de toda a superfície cilíndrica enquanto o relógio percorre o comprimento e a peça gira.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Como ler -->
+  <dialog id="dlg-ler" class="dialog">
+    <article>
+      <h3>Como ler este quadro de tolerância?</h3>
+      <div class="frame-explain">
+        <svg viewBox="0 0 360 44" class="frame-demo" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="359" height="43" rx="4" fill="#fff" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="54" y1="1" x2="54" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="142" y1="1" x2="142" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="242" y1="1" x2="242" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <!-- single-arrow circular symbol -->
+          <g transform="translate(14,10)">
+            <path d="M 4 16 L 22 16" stroke="#1a3a52" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 16 10 L 22 16 L 16 22" fill="none" stroke="#1a3a52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 6 16 C 6 6, 16 6, 16 14" fill="none" stroke="#1a3a52" stroke-width="1.6" stroke-linecap="round"/>
+          </g>
+          <text x="98" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#c41e3a">0,05</text>
+          <text x="192" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#2c2a25">A</text>
+          <text x="301" y="27" text-anchor="middle" font-size="11" fill="#4a4641">superfície</text>
+        </svg>
+        <ol>
+          <li><strong>1º compartimento — característica:</strong> símbolo de batimento (seta única = circular; seta dupla = total).</li>
+          <li><strong>2º compartimento — valor:</strong> tolerância permitida (ex.: 0,05 mm). Valor ilustrativo.</li>
+          <li><strong>3º compartimento — datum:</strong> referência A; o batimento é avaliado em torno desse eixo.</li>
+        </ol>
+      </div>
+      <div class="frame-explain">
+        <svg viewBox="0 0 360 44" class="frame-demo" aria-hidden="true">
+          <rect x="0.5" y="0.5" width="359" height="43" rx="4" fill="#fff" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="54" y1="1" x2="54" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="142" y1="1" x2="142" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <line x1="242" y1="1" x2="242" y2="43" stroke="#2c2a25" stroke-width="1.2"/>
+          <g transform="translate(10,9)">
+            <path d="M 4 16 L 22 16" stroke="#1a3a52" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 15 10 L 22 16 L 15 22" fill="none" stroke="#1a3a52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 4 10 L 11 16 L 4 22" fill="none" stroke="#1a3a52" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 6 16 C 6 6, 16 6, 16 14" fill="none" stroke="#1a3a52" stroke-width="1.6" stroke-linecap="round"/>
+          </g>
+          <text x="98" y="27" text-anchor="middle" font-size="13" font-weight="700" fill="#c41e3a">0,05</text>
+          <text x="192" y="27" text-anchor="middle" font-size="13" font-weight="600" fill="#2c2a25">A</text>
+          <text x="301" y="27" text-anchor="middle" font-size="11" fill="#4a4641">toda a superfície</text>
+        </svg>
+        <p><strong>Seta dupla = total.</strong> Controla a superfície cilíndrica inteira; o indicador translada ao longo do eixo enquanto a peça gira.</p>
+      </div>
+      <form method="dialog"><button class="btn btn-primary">Entendi</button></form>
+    </article>
+  </dialog>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
