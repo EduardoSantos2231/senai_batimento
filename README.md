@@ -1,6 +1,6 @@
 # Tolerâncias Geométricas: Runout - Aplicação Educacional
 
-Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Manufatura Mecânica.
+Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Mecânica.
 
 ## 📋 Índice
 
@@ -337,7 +337,7 @@ batimentos_senai/
 
 Esta aplicação foi desenhada para:
 
-- **Aula de Desenho Técnico** em cursos de Manufatura Mecânica
+- **Aula de Desenho Técnico** em cursos de Mecânica
 - **Estudo independente** de tolerâncias geométricas
 - **Demonstração** dos conceitos de runout e datum
 - **Experimentação** virtual sem necessidade de equipamento físico
@@ -350,7 +350,7 @@ Os valores de tolerância (`0,05 mm`) podem ser facilmente alterados no código 
 - Integração com softwares de metrologia real
 
 ---
-Desenvolvido para fins educacionais no contexto de Manufatura Mecânica.
+Desenvolvido para fins educacionais no contexto de Mecânica.
 Não representa instrumento de metrologia certificado.
 Valores de tolerância são ilustrativos - usar valores do desenho técnico oficial.
 README gerado automaticamente como parte dos entregáveis do projeto.

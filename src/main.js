@@ -194,7 +194,7 @@ function updateShaftGeometry(){
     markerStripe.position.y = SHAFT_R + eMid + 0.02;
   }
   if(highlightCyl){
-    highlightCyl.position.y = eMid * 0.55;
+    highlightCyl.position.y = eMid;
   }
   // flange só inclina no modo axial (erro axial), nos outros fica quadrado
   if(flangeMesh){
@@ -375,16 +375,6 @@ function buildDrawing(){
       <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
         <path d="M 0 0 L 10 5 L 0 10 z" fill="#2c2a25"/>
       </marker>
-      <g id="sym-circ">
-        <path d="M 5 19 L 17 7" stroke="#1a3a52" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-        <path d="M 19 4 L 10.5 6.2 L 13.8 11.4 Z" fill="#1a3a52"/>
-      </g>
-      <g id="sym-total">
-        <path d="M 3 19 L 13 9" stroke="#1a3a52" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-        <path d="M 15 6.5 L 7.2 8.2 L 10.1 12.6 Z" fill="#1a3a52"/>
-        <path d="M 10 21 L 20 11" stroke="#1a3a52" stroke-width="1.7" fill="none" stroke-linecap="round"/>
-        <path d="M 22 8.5 L 14.2 10.2 L 17.1 14.6 Z" fill="#1a3a52"/>
-      </g>
     </defs>
     ${frameSvg}
   </svg>`;
@@ -407,8 +397,8 @@ function updateReadout(theta, reading){
   const scale = (amp>1e-9) ? (reading / (amp*1.2)) : 0;
   needle.rotation.z = -THREE.MathUtils.clamp(scale, -1, 1) * (Math.PI*0.75);
   const eMid = amp * VIS_EXAG;
-  const phase = (amp>1e-9) ? (reading/amp) : 0;
-  const deltaVis = phase * eMid * 0.55;
+  // ponytail: haste segue exatamente a superfície (sem 0,55) — ponta sempre encostada, sem atravessar
+  const deltaVis = mode === 'axial' ? eMid * 0.85 * Math.cos(theta) : eMid * Math.cos(theta);
   tip.position.y = -PROBE_LEN + deltaVis;
   plunger.position.y = -0.95 + deltaVis;
   if(mode==='total'){
@@ -417,6 +407,7 @@ function updateReadout(theta, reading){
     if(traverse < -1){ traverse = -1; traverseDir = 1; }
     const x = traverse * (SHAFT_L/2 - 1.8);
     placeIndicator(new THREE.Vector3(x, SHAFT_R, 0), new THREE.Vector3(0,-1,0));
+    // reaplica deltaVis no novo frame (haste já posicionada acima)
     tip.position.y = -PROBE_LEN + deltaVis;
     plunger.position.y = -0.95 + deltaVis;
   }
