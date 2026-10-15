@@ -1,6 +1,6 @@
-# Tolerâncias Geométricas: Runout - Aplicação Educacional
+# Tolerâncias Geométricas: Batimento — Aplicação Educacional
 
-Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Mecânica.
+Aplicação web interativa para ensinar tolerâncias de batimento geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Mecânica.
 
 ## 🌐 Acesso rápido
 
@@ -55,25 +55,25 @@ https://eduardosantos2231.github.io/senai_batimento/
 
 Os símbolos de tolerância geométrica são criados usando SVG vetorial preciso, não aproximações textuais. Dois símbolos principais são exibidos:
 
-### Símbolo de Runout Circular (Single Arrow)
+### Símbolo de Batimento Circular (seta diagonal única ↗)
 - Representa o **batimento circular radial**
-- Com formato de seta única (↓)
+- Com formato de seta diagonal única (↗)
 - Indica que a variação é controlada em uma seção circular específica da superfície
-- SVG: seta única com direção radial
+- SVG: glifo único em `<defs>` reutilizado por `<use>` (id `sym-circ`)
 
-### Símbolo de Runout Total (Double Arrow / Wider Symbol)
-- Representa o **batimento total radial**  
-- Com formato de seta dupla ou área maior
+### Símbolo de Batimento Total (seta diagonal dupla ↗↗)
+- Representa o **batimento total radial**
+- Com formato de seta diagonal dupla (↗↗)
 - Indica que a variação é controlada sobre a superfície cilíndrica inteira
-- SVG: área mais ampla representando variação acumulada
+- SVG: glifo duplo em `<defs>` (id `sym-total`)
 
 ### Estrutura do Quadro de Controle (Feature Control Frame)
 
 Cada símbolo está dentro de um quadro com três compartimentos (lidos da esquerda para a direita):
 
-1. **Primeiro compartimento:** Símbolo geométrico característica
-   - Seta única = Runout Circular
-   - Seta dupla/área maior = Runout Total
+1. **Primeiro compartimento:** Símbolo de característica geométrica
+   - Seta única ↗ = Batimento Circular
+   - Seta dupla ↗↗ = Batimento Total
 
 2. **Segundo compartimento:** Valor da tolerância
    - Exemplo: `0,05 mm`
@@ -86,8 +86,8 @@ Cada símbolo está dentro de um quadro com três compartimentos (lidos da esque
 ### Exemplos Visuais
 
 ```
-[ seta única   | 0,05 | A ]  →  Runout Circular Radial
-[ área maior  | 0,05 | A ]  →  Runout Total Radial
+[ ↗   | 0,05 | A ]  →  Batimento Circular Radial
+[ ↗↗  | 0,05 | A ]  →  Batimento Total Radial
 ```
 
 Os quadros são interativos - clicar em um quadro seleciona o modo correspondente na simulação 3D.
@@ -99,15 +99,15 @@ Os quadros são interativos - clicar em um quadro seleciona o modo correspondent
 - **O que avalia:** Variação em uma seção circular individual da superfície
 - **Como é avaliado:** O indicador de dial fica em um ponto fixo na superfície cilíndrica enquanto a peça gira em torno do datum
 - **O que mede:** Deslocamento radial naquele círculo específico a cada revolução
-- **Símbolo:** Seta única (↓)
+- **Símbolo:** Seta diagonal única (↗)
 - **Frase-chave:** *"Verifica quanto a indicação varia em uma seção circular da superfície lateral enquanto a peça gira em torno do datum."*
 
 ### Runout Total (Total Runout)
 
 - **O que avalia:** Variação sobre toda a superfície cilíndrica
-- **Como é avaliado:** O indicador de dial percorre o comprimento da superfície enquanto a peça gira
+- **Como é avaliado:** O indicador percorre o comprimento da superfície enquanto a peça gira
 - **O que mede:** Variação acumulada que inclui tanto o deslocamento radial quanto o deslocamento axial ao longo de toda a superfície
-- **Símbolo:** Área maior / seta dupla (⇔)
+- **Símbolo:** Seta diagonal dupla (↗↗)
 - **Frase-chave:** *"Verifica a variação da superfície cilíndrica inteira, considerando a rotação da peça e o deslocamento do instrumento ao longo da superfície."*
 
 ### Distinção Importante
@@ -136,21 +136,21 @@ No desenho técnico:
 - Setas de seta dupla apontando para fora da linha (setas de localização de datum)
 - O datum é o "zero" para todas as medições angulares e lineares
 
-No cena 3D:
+Na cena 3D:
 - Eixo vermelho tracejado do datum A (cor `#c41e3a`)
 - Setas indicando a direção do datum
-- Rótulo "A" posicionado no eixo superior
+- Rótulo "A" posicionado no eixo
 
-### Relação entre Símbolo, Superfície Controlada e Measurement
+### Relação entre Símbolo, Superfície Controlada e Medição
 
 ```
 Símbolo de Tolerância
     ↓
 Datum A (referência)
     ↓
-Superfície Controlada (sinaleada no desenho)
+Superfície Controlada (sinalizada no desenho)
     ↓
-Medicao com indicador de dial
+Medição com relógio comparador
 ```
 
 ### Frase de Explicação (do aplicativo)
@@ -166,11 +166,11 @@ Medicao com indicador de dial
 
 ### Indicador de Dial (Dial Indicator)
 
-O aplicativo simula um indicador de dial mecânico com:
-- Face circular graduada (0 a 60 unidades)
-- Aguja que indica a deslocamento atual
-- Ponteiro (plunger) que entra em contato com a superfície
-- Dígito digital mostrando a leitura em mm
+O aplicativo simula um relógio comparador mecânico com:
+- Face circular graduada com agulha
+- Agulha que indica o deslocamento atual
+- Haste (plunger) e ponta que entram em contato com a superfície
+- Display digital mostrando a leitura em mm
 
 ### Leituras Registradas
 
@@ -181,55 +181,57 @@ reading = deslocamento radial (modo radial)
 reading = deslocamento axial,face (modo axial)
 ```
 
-### Cálculo do TIR (Total Indicated Runout)
+### Cálculo da variação (máx − mín)
 
-O TIR é calculado como a diferença entre a máxima e mínima leituras:
+A variação é a diferença entre a máxima e a mínima leituras:
 
 ```
-TIR = máxima leitura - mínima leitura
+variação = máxima leitura − mínima leitura
 ```
 
 No aplicativo:
 - As leituras são acumuladas durante a rotação
 - Mínima leitura = menor deslocamento observado
 - Máxima leitura = maior deslocamento observado
-- TIR = diferença entre max e min
+- Variação = diferença entre máx e mín
 
 ### Exemplo Prático
 
-Se durante 3 revoluções as leituras mínimas e máximas forem:
+Se durante a rotação as leituras mínimas e máximas forem:
 - Mínima: 0,01 mm
 - Máxima: 0,06 mm
 
-Então: **TIR = 0,06 - 0,01 = 0,05 mm**
+Então: **variação = 0,06 − 0,01 = 0,05 mm**
 
 ### Comparação com a Tolerância
 
-O aplicativo compara o TIR calculado com o valor especificado no quadro de controle:
+O aplicativo compara a variação calculada com o valor do quadro de controle e mostra o veredito:
 
 ```
-Se TIR ≤ tolerância especificada → RESULTADO: PASS
-Se TIR > tolerância especificada → RESULTADO: FAIL
+Se variação ≤ tolerância → Dentro da tolerância
+Se variação >  tolerância → Fora da tolerância
 ```
 
-**Atenção:** O aplicativo NÃO trata automaticamente o valor como aceitável ou inaceitável. A comparação é feita visivelmente, e o estudante deve interpretar o resultado.
+O veredito é exibido na interface ("Dentro/Fora da tolerância — variação … mm ≤/> … mm"); o estudante deve sempre conferir o valor do desenho oficial.
 
 ### Controles de Medição
 
-- **Start/Pause:** Inicia ou pausa a rotação do fuso
-- **Reset:** Zera todas as estatísticas (min, max, TIR, leituras)
-- **TIR:** Calcula TIR a partir das leituras atuais
-- **Geometric Error Amplitude:** Controla a excentricidade simulada (amplitude do erro geométrico)
-- **Rotation Speed:** Controla a velocidade de rotação (multiplicador)
+- **Iniciar/Pausar:** Inicia ou pausa a rotação do eixo
+- **Uma volta (360°):** Gira exatamente uma volta e para (coleta mín/máx/variação de uma revolução)
+- **Zerar:** Zera todas as estatísticas (mín, máx, variação)
+- **Velocidade:** Controla a velocidade de rotação (0,2× a 2,5×)
+- **Excentricidade e:** Controla a excentricidade simulada; variação ≈ 2×e (slider 0 a 0,12 mm)
+- **Restaurar câmera / Mostrar eixo de referência:** Controles de visualização
+- **Ícones (?):** Cada termo (Leitura, Mín/Máx, Variação, Tolerância, Datum, Excentricidade, Navegação) tem um card explicativo
 
 ## 🎓 Simplificações Educacionais
 
 Para manter a aplicação acessível e focada no aprendizado, as seguintes simplificações foram aplicadas:
 
 ### 1. Modelo Geométrico Simplificado
-- Base cilíndrica com deformação senoidal (excentricidade/empeno) exagerada para visualização; leitura em mm é real
-- Excentricidade `e` (slider) gera batimento `TIR ≈ 2·e`; total com empeno (bow) varia ao longo do comprimento
-- Não inclui efeitos de alongamento térmico, desgaste de rolamentos, ou outras condições reais
+- Base cilíndrica com deformação exagerada (excentricidade/empeno) para visualização; leitura em mm é real
+- Excentricidade `e` (slider) gera variação `≈ 2·e`; batimento total com empeno (bow) varia ao longo do comprimento
+- Não inclui efeitos de alongamento térmico, desgaste de rolamentos ou outras condições reais
 
 ### 2. Modelo de Medição Simplificado
 - Apenas o deslocamento radial ou axial é medido
@@ -246,28 +248,30 @@ Para manter a aplicação acessível e focada no aprendizado, as seguintes simpl
 - Em prática, os datums têm tolerâncias de localização themselves
 - A superfície do datum também tem imperfeições
 
-### 5. Nenhuma Avaliação de Aceitabilidade Automatizada
-- O aplicativo mostra PASS/FAIL baseado na comparação
-- Em ambientes de metrologia real, fatores adicionais afetam a validade
-- O estudante deve sempre consultar o padrão completo (ex: ASME Y14.5, ISO 1101)
+### 5. Avaliação de Aceitabilidade
+- O aplicativo exibe o veredito "Dentro/Fora da tolerância" comparando variação com o valor do quadro
+- Em metrologia real fatores adicionais afetam a validade
+- O estudante deve sempre consultar o padrão completo (ex.: ASME Y14.5, ISO 1101)
 
 ### 6. Superfície Cilíndrica Ideal
 - A superfície de medição é um cilindro perfeito
 - Em peças reais, rugosidade, propriedades do material e condições de suporte afetam a medição
 
 ### 7. Orientações Fixas
-- A direção do indicador é fixa relative ao fuso
+- A direção do indicador é fixa em relação ao eixo
 - Em aplicações reais, a orientação pode variar conforme o projeto
 
-### 8. Superfície do Flanco Simplificada
-- O flanco é mostrado como um cilindro plano
-- Em peças reais, pode ter chanfros, fendas, ou outras características
+### 8. Superfície do Flange Simplificada
+- O flange é mostrado como um disco plano
+- Em peças reais, pode ter chanfros, rasgos ou outras características
 
 ## 📁 Estrutura do Projeto
 
 ```
 batimentos_senai/
 ├── package.json          # Configuração do Vite e dependências
+├── vite.config.js        # Base "/senai_batimento/" para GitHub Pages
+├── .github/workflows/deploy.yml  # Build + deploy no GitHub Pages
 ├── index.html           # Estrutura HTML principal
 ├── src/
 │   ├── main.js          # Lógica Three.js, simulação, desenho e controle
@@ -285,25 +289,20 @@ batimentos_senai/
 
 2. **src/main.js** - Lógica principal incluindo:
    - Inicialização do Three.js (cena, câmera, renderer, controles)
-   - Criação de geometrias (fuso, eixo de datum, indicador de dial)
+   - Criação de geometrias (eixo, datum, relógio comparador)
    - Lógica de modos (radial, axial, total)
-   - Cálculo de TIR e comparação com tolerância
-   - Controles de interface (botões, sliders, eventos)
+   - Cálculo da variação (máx − mín) e veredito vs. tolerância
+   - Controles de interface (botões, sliders, eventos, cards "?")
    - Loop de animação com requestAnimationFrame
 
 3. **src/style.css** - Estilização com tema de desenho técnico:
-   - Fundo claro resembling folha de engenharia
+   - Fundo claro lembrando folha de engenharia
    - Linhas técnicas escuras
    - Grade sutil
    - Componentes metálicos em 3D
-   - Cores de acento contidas (azul, vermelho, verde)
+   - Cores de acento contidas (azul, vermelho)
 
-4. **src/technical-drawing.js** - Gerador de desenho SVG:
-   - Projeção ortográfica do fuso com dimensões
-   - Referência de datum A
-   - Quadros de controle de tolerância (3 frames)
-   - Linhas de referência e anotações
-   - Elementos interativos (clique em frames)
+4. **src/technical-drawing.js** - Rascunho não usado (mantido para referência; todo o desenho atual é gerado em `main.js`)
 
 ## 🎯 Funcionalidades Principais
 
@@ -315,13 +314,13 @@ batimentos_senai/
 
 ### Controles da Simulação
 
-- Botão Start/Pausar para rotação do fuso
-- Controle de velocidade de rotação (0,2× a 2,5×)
-- Controle de excentricidade `e` (TIR ≈ 2×e)
-- Botão Reset para zerar medições (min, máx, TIR)
-- Botão "Como ler este símbolo?" para ajuda educacional
+- Botões Iniciar/Pausar e Uma volta (360°) para rotação
+- Controle de velocidade (0,2× a 2,5×)
+- Controle de excentricidade `e` (variação ≈ 2×e)
+- Botão Zerar para zerar medições (mín, máx, variação)
+- Botões "Como ler este símbolo?" e "Comparar tolerâncias" + ícones (?) com cards explicativos
 - Botão Restaurar câmera
-- Checkbox mostrar/ocultar eixo de datum
+- Checkbox Mostrar eixo de referência
 
 ### Destaques Interativos
 
