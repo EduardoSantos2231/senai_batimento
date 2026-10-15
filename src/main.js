@@ -51,7 +51,7 @@ let shaftGroup, shaftMesh, shaftBasePositions, flangeMesh, markerStripe;
 let datumGroup;
 let indicatorGroup, needle, plunger, tip, dialGroup;
 let arrowRadial, arrowAxial;
-let highlightCyl, highlightFace;
+let highlightCyl, highlightFace, highlightBasePositions;
 const SHAFT_R = 1.2;
 const SHAFT_L = 6.0;
 const FLANGE_R = 1.9;
@@ -139,9 +139,10 @@ function buildShaft(){
   chamfer.position.x = -SHAFT_L/2 + 0.06;
   shaftGroup.add(chamfer);
 
-  const cylHlGeo = new THREE.CylinderGeometry(SHAFT_R*1.015, SHAFT_R*1.015, SHAFT_L*0.62, 32, 1, true);
+  const cylHlGeo = new THREE.CylinderGeometry(SHAFT_R*1.015, SHAFT_R*1.015, SHAFT_L*0.62, 32, 32, true);
   cylHlGeo.rotateZ(Math.PI/2);
   highlightCyl = new THREE.Mesh(cylHlGeo, new THREE.MeshStandardMaterial({ color:0x1a5a8a, transparent:true, opacity:0.0, side:THREE.DoubleSide }));
+  highlightBasePositions = cylHlGeo.attributes.position.array.slice();
   shaftGroup.add(highlightCyl);
 
   const faceHlGeo = new THREE.CircleGeometry(FLANGE_R*0.92, 32);
@@ -198,8 +199,21 @@ function updateShaftGeometry(){
   if(markerStripe){
     markerStripe.position.y = SHAFT_R + eMid + 0.02;
   }
-  if(highlightCyl){
-    highlightCyl.position.y = eMid;
+  if(highlightCyl && highlightBasePositions){
+    const hp = highlightCyl.geometry.attributes.position.array;
+    const hb = highlightBasePositions;
+    for(let i=0;i<hp.length;i+=3){
+      const x = hb[i];
+      const y0 = hb[i+1];
+      const ax = Math.abs(x);
+      let w;
+      if(ax < 1.2) w = 1;
+      else if(ax < 1.8) w = Math.cos((ax - 1.2) / 0.6 * Math.PI * 0.5);
+      else w = 0;
+      hp[i+1] = y0 + eMid * w * bowFactor(x);
+    }
+    highlightCyl.geometry.attributes.position.needsUpdate = true;
+    highlightCyl.geometry.computeVertexNormals();
   }
   // flange só inclina no modo axial (erro axial), nos outros fica quadrado
   if(flangeMesh){
