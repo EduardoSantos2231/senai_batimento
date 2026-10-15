@@ -151,7 +151,8 @@ function buildShaft(){
   shaftGroup.add(highlightFace);
 
   const supMat = new THREE.MeshStandardMaterial({ color:0x2c2a25, roughness:0.9 });
-  for(const x of [-2.0, 1.2]){
+  // ponytail: apoios em trechos redondos (fora da janela de deformação) — datum A limpo
+  for(const x of [-2.1, 2.1]){
     const base = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 1.4), supMat);
     base.position.set(x, -1.35, 0);
     base.castShadow = true; base.receiveShadow = true;
@@ -166,24 +167,28 @@ function buildShaft(){
   updateShaftGeometry();
 }
 
+function bowFactor(x){ return 1 + 0.45 * (x / (SHAFT_L/2)); }
+
 function updateShaftGeometry(){
   if(!shaftMesh || !shaftBasePositions) return;
-  const eMid = amp * VIS_EXAG;
+  // axial: só face, não excentricidade radial — item 1
+  const eMid = mode === 'axial' ? 0 : amp * VIS_EXAG;
   const pos = shaftMesh.geometry.attributes.position.array;
   const base = shaftBasePositions;
-  // janela suave: 0 nos mancais (|x| > 2.2), rampa cosseno até 1 no miolo (|x| < 1.0)
+  // janela entre apoios (apoios em ±2.1 ficam redondos, w≈0) — item 3
   for(let i=0;i<pos.length;i+=3){
     const x = base[i];
     const y0 = base[i+1];
     const ax = Math.abs(x);
     let w;
-    if(ax < 1.0) w = 1;
-    else if(ax < 2.3) w = Math.cos((ax - 1.0) / 1.3 * Math.PI * 0.5);
+    if(ax < 1.2) w = 1;
+    else if(ax < 1.8) w = Math.cos((ax - 1.2) / 0.6 * Math.PI * 0.5);
     else w = 0;
-    // só deforma se é superfície lateral (|r| ~ SHAFT_R), não as tampas
-    const r = Math.hypot(y0, base[i+2]);
+    // só deforma se é superfície lateral, não as tampas
     const isCap = Math.abs(Math.abs(x) - SHAFT_L/2) < 0.02;
-    pos[i+1] = isCap ? y0 : y0 + eMid * w;
+    // bow (empeno) varia ao longo do eixo — item 2: total ≠ circular
+    const bow = isCap ? 1 : bowFactor(x);
+    pos[i+1] = isCap ? y0 : y0 + eMid * w * bow;
     // z inalterado
   }
   shaftMesh.geometry.attributes.position.needsUpdate = true;
@@ -341,14 +346,13 @@ function buildDrawing(){
       <text x="${W-14}" y="20" font-size="9" fill="#6b6760" text-anchor="end">mm · datum A</text>
     </g>
     <rect x="110" y="86" width="310" height="56" rx="1.2" fill="#eef3f4" stroke="#2c2a25" stroke-width="1.4"/>
-    <line x1="110" y1="102" x2="420" y2="102" class="dwg-hidden"/>
-    <line x1="110" y1="126" x2="420" y2="126" class="dwg-hidden"/>
     <rect x="420" y="68" width="28" height="92" rx="1.2" fill="#f3e0c0" stroke="#2c2a25" stroke-width="1.4"/>
     <line x1="110" y1="86" x2="118" y2="94" stroke="#2c2a25" stroke-width="1"/>
     <line x1="110" y1="142" x2="118" y2="134" stroke="#2c2a25" stroke-width="1"/>
     <line x1="92" y1="114" x2="468" y2="114" class="dwg-center"/>
     <text x="464" y="110" font-size="10" font-weight="800" fill="#c41e3a">A</text>
-    <polygon points="168,150 188,150 178,166" fill="#c41e3a" stroke="#7a0f1f" stroke-width="0.8"/>
+    <line x1="178" y1="142" x2="178" y2="158" stroke="#2c2a25" stroke-width="0.9"/>
+    <polygon points="168,158 188,158 178,142" fill="#c41e3a" stroke="#7a0f1f" stroke-width="0.8"/>
     <rect x="162" y="166" width="32" height="14" rx="2" fill="#fff" stroke="#2c2a25" stroke-width="1"/><text x="178" y="176.5" text-anchor="middle" font-size="9" font-weight="700" fill="#2c2a25">A</text>
     <g stroke="#2c2a25" stroke-width="0.9" fill="none">
       <line x1="110" y1="62" x2="110" y2="52"/><line x1="420" y1="62" x2="420" y2="52"/>
@@ -383,12 +387,21 @@ function buildDrawing(){
 
 let traverse = 0;
 let traverseDir = 1;
+function windowAt(x){
+  const ax = Math.abs(x);
+  if(ax < 1.2) return 1;
+  if(ax < 1.8) return Math.cos((ax - 1.2) / 0.6 * Math.PI * 0.5);
+  return 0;
+}
 function computeReading(theta){
-  if(mode==='radial') return amp * Math.cos(theta);
+  if(mode==='radial'){
+    const x = RADIAL_CONTACT_X;
+    return amp * Math.cos(theta) * bowFactor(x) * windowAt(x);
+  }
   if(mode==='axial') return amp * 0.85 * Math.cos(theta);
   const x = traverse * (SHAFT_L/2 - 1.8);
-  const taper = amp * 0.35 * (x / (SHAFT_L/2));
-  return amp * Math.cos(theta) + taper * Math.cos(theta*1.7);
+  // bow total: excentricidade varia ao longo — física correta para total (item 2)
+  return amp * Math.cos(theta) * bowFactor(x) * windowAt(x);
 }
 function updateReadout(theta, reading){
   if(reading < minR) minR = reading;
@@ -396,20 +409,30 @@ function updateReadout(theta, reading){
   const tir = (isFinite(minR) && isFinite(maxR)) ? (maxR - minR) : 0;
   const scale = (amp>1e-9) ? (reading / (amp*1.2)) : 0;
   needle.rotation.z = -THREE.MathUtils.clamp(scale, -1, 1) * (Math.PI*0.75);
-  const eMid = amp * VIS_EXAG;
-  // ponytail: haste segue exatamente a superfície (sem 0,55) — ponta sempre encostada, sem atravessar
-  const deltaVis = mode === 'axial' ? eMid * 0.85 * Math.cos(theta) : eMid * Math.cos(theta);
-  tip.position.y = -PROBE_LEN + deltaVis;
-  plunger.position.y = -0.95 + deltaVis;
+  const eMid = mode === 'axial' ? 0 : amp * VIS_EXAG;
+  // ponytail: haste segue exatamente a superfície — ponta sempre encostada, sem atravessar (item 5: inclui w e bow)
+  let effectiveDelta;
+  if(mode === 'axial'){
+    effectiveDelta = amp * VIS_EXAG * 0.85 * Math.cos(theta);
+  } else if(mode === 'total'){
+    const x = traverse * (SHAFT_L/2 - 1.8);
+    effectiveDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
+  } else {
+    const x = RADIAL_CONTACT_X;
+    effectiveDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
+  }
+  tip.position.y = -PROBE_LEN + effectiveDelta;
+  plunger.position.y = -0.95 + effectiveDelta;
   if(mode==='total'){
     traverse += 0.003 * speed * traverseDir;
     if(traverse > 1) { traverse = 1; traverseDir = -1; }
     if(traverse < -1){ traverse = -1; traverseDir = 1; }
     const x = traverse * (SHAFT_L/2 - 1.8);
     placeIndicator(new THREE.Vector3(x, SHAFT_R, 0), new THREE.Vector3(0,-1,0));
-    // reaplica deltaVis no novo frame (haste já posicionada acima)
-    tip.position.y = -PROBE_LEN + deltaVis;
-    plunger.position.y = -0.95 + deltaVis;
+    // reaplica no novo frame (usa o x atualizado no próximo tick)
+    const nextDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
+    tip.position.y = -PROBE_LEN + nextDelta;
+    plunger.position.y = -0.95 + nextDelta;
   }
   const fmt = (v)=> (Math.abs(v)<0.0005? '0,000' : v.toFixed(3).replace('.',','));
   els.valAtual.textContent = `${fmt(reading)} mm`;
