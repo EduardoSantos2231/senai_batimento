@@ -409,7 +409,7 @@ function updateReadout(theta, reading){
   // ponytail: haste segue exatamente a superfície — ponta sempre encostada, sem atravessar (item 5: inclui w e bow)
   let effectiveDelta;
   if(mode === 'axial'){
-    effectiveDelta = amp * VIS_EXAG * 0.85 * Math.cos(theta);
+    effectiveDelta = -amp * VIS_EXAG * 0.85 * Math.cos(theta); // tampa em FLANGE_FACE_X - amp*VIS_EXAG*0,85*cosθ
   } else if(mode === 'total'){
     const x = traverse * (SHAFT_L/2 - 1.8);
     effectiveDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
