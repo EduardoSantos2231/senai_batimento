@@ -1,6 +1,6 @@
 # Tolerâncias Geométricas: Runout - Aplicação Educacional
 
-Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Manufatura Mecânica.
+Aplicação web interativa para ensinar tolerâncias de runout geométrico em desenhos técnicos, desenvolvida para estudantes de cursos técnicos de Mecânica.
 
 ## 📋 Índice
 
@@ -111,7 +111,7 @@ Os quadros são interativos - clicar em um quadro seleciona o modo correspondent
 
 Na aplicação, isso se manifesta de forma diferente:
 - No modo **Circular Radial**: o indicador fica em um ponto da superfície circular
-- No modo **Total Radial**: o indicador move-se ao longo do eixo Z enquanto a peça gira
+- No modo **Total Radial**: o indicador move-se ao longo do eixo X enquanto a peça gira
 
 ## 📏 Como o Eixo de Datum é Utilizado
 
@@ -130,8 +130,8 @@ No desenho técnico:
 - Setas de seta dupla apontando para fora da linha (setas de localização de datum)
 - O datum é o "zero" para todas as medições angulares e lineares
 
-No escena 3D:
-- Eixo vermelho circulando o fuso (cor `#e74c3c`)
+No cena 3D:
+- Eixo vermelho tracejado do datum A (cor `#c41e3a`)
 - Setas indicando a direção do datum
 - Rótulo "A" posicionado no eixo superior
 
@@ -221,8 +221,8 @@ Se TIR > tolerância especificada → RESULTADO: FAIL
 Para manter a aplicação acessível e focada no aprendizado, as seguintes simplificações foram aplicadas:
 
 ### 1. Modelo Geométrico Simplificado
-- O fuso é um cilindro perfeitamente cilíndrico
-- A excentricidade é simulada com uma variação senoidal simples
+- Base cilíndrica com deformação senoidal (excentricidade/empeno) exagerada para visualização; leitura em mm é real
+- Excentricidade `e` (slider) gera batimento `TIR ≈ 2·e`; total com empeno (bow) varia ao longo do comprimento
 - Não inclui efeitos de alongamento térmico, desgaste de rolamentos, ou outras condições reais
 
 ### 2. Modelo de Medição Simplificado
@@ -263,11 +263,10 @@ Para manter a aplicação acessível e focada no aprendizado, as seguintes simpl
 batimentos_senai/
 ├── package.json          # Configuração do Vite e dependências
 ├── index.html           # Estrutura HTML principal
-├── styles.css           # Estilização (tema técnico-drawing)
 ├── src/
-│   ├── main.js          # Lógica Three.js, simulação, controle
-│   ├── style.css        # Estilos (cópia do styles.css ou overrides)
-│   └── technical-drawing.js  # Gerador SVG do desenho técnico
+│   ├── main.js          # Lógica Three.js, simulação, desenho e controle
+│   ├── style.css        # Estilos (tema folha de desenho)
+│   └── technical-drawing.js  # Rascunho não usado (todo em main.js)
 └── README.md            # Este arquivo
 ```
 
@@ -311,13 +310,12 @@ batimentos_senai/
 ### Controles da Simulação
 
 - Botão Start/Pausar para rotação do fuso
-- Controle de velocidade de rotação (0.5x a 3x)
-- Controle de amplitude do erro geométrico
-- Botão Reset para zerar medições
-- Botão Calcular TIR
+- Controle de velocidade de rotação (0,2× a 2,5×)
+- Controle de excentricidade `e` (TIR ≈ 2×e)
+- Botão Reset para zerar medições (min, máx, TIR)
 - Botão "Como ler este símbolo?" para ajuda educacional
-- Botão Restore Camera
-- Toggle mostrar/ocultar eixo de datum
+- Botão Restaurar câmera
+- Checkbox mostrar/ocultar eixo de datum
 
 ### Destaques Interativos
 
@@ -337,7 +335,7 @@ batimentos_senai/
 
 Esta aplicação foi desenhada para:
 
-- **Aula de Desenho Técnico** em cursos de Manufatura Mecânica
+- **Aula de Desenho Técnico** em cursos de Mecânica
 - **Estudo independente** de tolerâncias geométricas
 - **Demonstração** dos conceitos de runout e datum
 - **Experimentação** virtual sem necessidade de equipamento físico
@@ -350,7 +348,7 @@ Os valores de tolerância (`0,05 mm`) podem ser facilmente alterados no código 
 - Integração com softwares de metrologia real
 
 ---
-Desenvolvido para fins educacionais no contexto de Manufatura Mecânica.
+Desenvolvido para fins educacionais no contexto de Mecânica.
 Não representa instrumento de metrologia certificado.
 Valores de tolerância são ilustrativos - usar valores do desenho técnico oficial.
 README gerado automaticamente como parte dos entregáveis do projeto.
