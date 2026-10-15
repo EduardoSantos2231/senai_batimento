@@ -248,13 +248,9 @@ function makeTextSprite(text, color){
 
 function buildIndicator(){
   indicatorGroup = new THREE.Group();
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,2.2,12), new THREE.MeshStandardMaterial({ color:0x2c2a25 }));
-  stem.position.set(0,-0.55,0);
+  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.09,1.45,12), new THREE.MeshStandardMaterial({ color:0x2c2a25 }));
+  stem.position.set(0,-0.175,0);
   indicatorGroup.add(stem);
-  const base = new THREE.Mesh(new THREE.BoxGeometry(1.1,0.18,0.9), new THREE.MeshStandardMaterial({ color:0x2c2a25 }));
-  base.position.set(0,-1.55,0);
-  base.castShadow=true;
-  indicatorGroup.add(base);
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,0.18,32), new THREE.MeshStandardMaterial({ color:0x1a3a52, metalness:0.2, roughness:0.6 }));
   body.rotation.x = Math.PI/2;
   body.castShadow = true;
@@ -290,7 +286,7 @@ function buildIndicator(){
   plunger.castShadow = true;
   indicatorGroup.add(plunger);
   tip = new THREE.Mesh(new THREE.SphereGeometry(0.09,16,12), new THREE.MeshStandardMaterial({ color:0xc41e3a }));
-  tip.position.y = -PROBE_LEN;
+  tip.position.y = -PROBE_LEN + 0.09; // centro = fundo + raio: ponta encosta, não atravessa
   tip.castShadow = true;
   indicatorGroup.add(tip);
   scene.add(indicatorGroup);
@@ -421,7 +417,7 @@ function updateReadout(theta, reading){
     const x = RADIAL_CONTACT_X;
     effectiveDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
   }
-  tip.position.y = -PROBE_LEN + effectiveDelta;
+  tip.position.y = -PROBE_LEN + 0.09 + effectiveDelta;
   plunger.position.y = -0.95 + effectiveDelta;
   if(mode==='total'){
     traverse += 0.003 * speed * traverseDir;
@@ -431,7 +427,7 @@ function updateReadout(theta, reading){
     placeIndicator(new THREE.Vector3(x, SHAFT_R, 0), new THREE.Vector3(0,-1,0));
     // reaplica no novo frame (usa o x atualizado no próximo tick)
     const nextDelta = amp * VIS_EXAG * Math.cos(theta) * bowFactor(x) * windowAt(x);
-    tip.position.y = -PROBE_LEN + nextDelta;
+    tip.position.y = -PROBE_LEN + 0.09 + nextDelta;
     plunger.position.y = -0.95 + nextDelta;
   }
   const fmt = (v)=> (Math.abs(v)<0.0005? '0,000' : v.toFixed(3).replace('.',','));
@@ -456,7 +452,7 @@ function resetStats(){
   els.valMax.textContent = '—';
   els.valTir.textContent = '—';
   needle.rotation.z = 0;
-  tip.position.y = -PROBE_LEN;
+  tip.position.y = -PROBE_LEN + 0.09;
   plunger.position.y = -0.95;
   if(mode==='total') placeIndicator(new THREE.Vector3(-SHAFT_L/2+1.8, SHAFT_R, 0), new THREE.Vector3(0,-1,0));
 }
